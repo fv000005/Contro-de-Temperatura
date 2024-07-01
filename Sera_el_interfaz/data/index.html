@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlador PID</title>
+    <!-- Incluyendo Bootstrap y FontAwesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h1">Controlador PID</span>
+    </nav>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Temperatura 1 -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura 1</h5>
+                        <p class="card-text"><span id="temperatura1">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Temperatura 2 -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura 2</h5>
+                        <p class="card-text"><span id="temperatura2">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Temperatura 3 -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura 3</h5>
+                        <p class="card-text"><span id="temperatura3">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Temperatura 4 -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura 4</h5>
+                        <p class="card-text"><span id="temperatura4">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Temperatura VENTILADOR -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura VENTILADOR</h5>
+                        <p class="card-text"><span id="temperatura5">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Temperatura SALA -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-thermometer-half"></i> Temperatura SALA</h5>
+                        <p class="card-text"><span id="temperatura6">0</span> °C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Setpoint -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-bullseye"></i> Setpoint</h5>
+                        <p class="card-text"><span id="setpoint">0</span> °C</p>
+                        <input type="range" class="custom-range" min="20" max="40" value="0" id="setpointSlider" onchange="updateSetpoint(this)">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Ciclo -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-sync-alt"></i> Ciclo</h5>
+                        <p class="card-text"><span id="ciclo">0</span> %</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-4">
+                <!-- Estado del LED -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-lightbulb"></i> Estado de la Bomba</h5>
+                        <p class="card-text">Bomba: <span id="led">OFF</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4">
+                <!-- Configuración del PID -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-sliders-h"></i> Configuración del PID</h5>
+                        <form id="pidForm">
+                            <div class="form-group">
+                                <label for="kp">Kp:</label>
+                                <input type="number" step="0.01" class="form-control" id="kp" placeholder="Kp">
+                            </div>
+                            <div class="form-group">
+                                <label for="ki">Ki:</label>
+                                <input type="number" step="0.01" class="form-control" id="ki" placeholder="Ki">
+                            </div>
+                            <div class="form-group">
+                                <label for="kd">Kd:</label>
+                                <input type="number" step="0.01" class="form-control" id="kd" placeholder="Kd">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="updatePID()">Actualizar PID</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4">
+                <!-- Gráfica en tiempo real -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-chart-line"></i> Gráfica en tiempo real</h5>
+                        <canvas id="chartCanvas" width="400" height="200"></canvas>
+                        <div id="chartLegend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 mt-4">
+                <!-- Botón para guardar CSV -->
+                <button type="button" class="btn btn-success" onclick="saveCSV()">Guardar en CSV</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
